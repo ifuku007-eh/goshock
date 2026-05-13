@@ -1,0 +1,22 @@
+# Node
+node_modules
+.next
+
+# Env
+.env
+
+# Go
+*.exe
+*.test
+*.out
+
+# Database
+*.db
+*.db-journal
+
+# Logs
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db

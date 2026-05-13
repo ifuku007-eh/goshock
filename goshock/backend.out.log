@@ -1,0 +1,36 @@
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /api/qr/:code             --> goshock/handlers.(*Handler).GetQRCode-fm (4 handlers)
+[GIN-debug] POST   /api/register             --> goshock/handlers.(*AuthHandler).Register-fm (4 handlers)
+[GIN-debug] POST   /api/login                --> goshock/handlers.(*AuthHandler).Login-fm (4 handlers)
+[GIN-debug] POST   /api/logout               --> goshock/handlers.(*AuthHandler).Logout-fm (4 handlers)
+[GIN-debug] GET    /api/me                   --> goshock/handlers.(*AuthHandler).Me-fm (5 handlers)
+[GIN-debug] POST   /api/shorten              --> goshock/handlers.(*Handler).ShortenURL-fm (5 handlers)
+[GIN-debug] GET    /api/stats/:code          --> goshock/handlers.(*Handler).GetStats-fm (5 handlers)
+[GIN-debug] GET    /api/links                --> goshock/handlers.(*Handler).GetAllLinks-fm (5 handlers)
+[GIN-debug] DELETE /api/links/:code          --> goshock/handlers.(*Handler).DeleteLink-fm (5 handlers)
+[GIN-debug] GET    /:code                    --> goshock/handlers.(*Handler).RedirectURL-fm (4 handlers)
+[GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
+Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies for details.
+[GIN-debug] Listening and serving HTTP on :8080
+[GIN] 2026/05/12 - 12:56:43 | 401 |       992.4µs |             ::1 | GET      "/api/links"
+[GIN] 2026/05/12 - 12:59:56 | 201 |    152.2738ms |             ::1 | POST     "/api/register"
+[GIN] 2026/05/12 - 13:01:08 | 204 |            0s |             ::1 | OPTIONS  "/api/login"
+[GIN] 2026/05/12 - 13:01:08 | 401 |       999.7µs |             ::1 | POST     "/api/login"
+[GIN] 2026/05/12 - 13:02:39 | 201 |    137.8026ms |             ::1 | POST     "/api/register"
+[GIN] 2026/05/12 - 13:02:39 | 200 |       992.2µs |             ::1 | GET      "/api/links"
+[GIN] 2026/05/12 - 13:03:02 | 204 |            0s |             ::1 | OPTIONS  "/api/register"
+[GIN] 2026/05/12 - 13:03:03 | 201 |    157.1078ms |             ::1 | POST     "/api/register"
+[GIN] 2026/05/12 - 13:03:23 | 201 |    163.7794ms |             ::1 | POST     "/api/register"
+[GIN] 2026/05/12 - 13:03:23 | 200 |      17.856ms |             ::1 | POST     "/api/shorten"
+[GIN] 2026/05/12 - 13:03:24 | 200 |         506µs |             ::1 | GET      "/api/links"
+[GIN] 2026/05/12 - 13:04:46 | 404 |            0s |             ::1 | GET      "/"
+[GIN] 2026/05/12 - 13:05:37 | 204 |            0s |             ::1 | OPTIONS  "/api/login"
+[GIN] 2026/05/12 - 13:09:17 | 404 |            0s |             ::1 | GET      "/"
+[GIN] 2026/05/12 - 13:09:41 | 204 |            0s |             ::1 | OPTIONS  "/api/login"
+[GIN] 2026/05/12 - 14:27:10 | 401 |     65.1271ms |             ::1 | GET      "/api/me"
+[GIN] 2026/05/12 - 14:31:00 | 404 |            0s |             ::1 | GET      "/"

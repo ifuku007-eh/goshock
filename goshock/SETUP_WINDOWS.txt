@@ -1,0 +1,123 @@
+# ============================================================
+#  GoShock — Setup Guide (Windows + VS Code)
+#  Jalankan perintah ini satu per satu di Terminal VS Code
+#  Terminal: PowerShell atau Command Prompt (bukan Git Bash)
+# ============================================================
+
+
+# ════════════════════════════════════════════════════════════
+#  PRE-REQUISITE: Install GCC untuk Windows (WAJIB untuk SQLite)
+#  Lakukan SEKALI saja, skip kalau sudah punya
+# ════════════════════════════════════════════════════════════
+
+# 1. Buka PowerShell sebagai Administrator, lalu jalankan:
+winget install -e --id GnuWin32.Make
+
+# 2. Install TDM-GCC (GCC untuk Windows):
+#    Download & install dari: https://github.com/jmeubank/tdm-gcc/releases/download/v10.3.0-tdm64-2/tdm64-gcc-10.3.0-2.exe
+#    CENTANG opsi "Add to PATH" saat instalasi!
+
+# 3. Tutup dan buka ulang VS Code setelah install GCC
+# 4. Verifikasi GCC sudah terinstall:
+gcc --version
+
+
+# ════════════════════════════════════════════════════════════
+#  STEP 1: Buat folder project
+# ════════════════════════════════════════════════════════════
+
+mkdir goshock
+cd goshock
+
+
+# ════════════════════════════════════════════════════════════
+#  STEP 2: Buat struktur folder
+# ════════════════════════════════════════════════════════════
+
+mkdir handlers
+mkdir models
+mkdir storage
+mkdir utils
+mkdir templates
+
+
+# ════════════════════════════════════════════════════════════
+#  STEP 3: Copy semua file ke lokasi yang benar
+#  (Lihat daftar file dan isinya di bawah panduan ini)
+# ════════════════════════════════════════════════════════════
+
+#  Struktur akhir yang harus ada:
+#  goshock/
+#  ├── main.go
+#  ├── go.mod
+#  ├── handlers/
+#  │   └── handler.go
+#  ├── models/
+#  │   └── url.go
+#  ├── storage/
+#  │   └── sqlite.go
+#  ├── utils/
+#  │   └── shortcode.go
+#  └── templates/
+#      └── index.html
+
+
+# ════════════════════════════════════════════════════════════
+#  STEP 4: Set environment variable CGO (wajib untuk SQLite)
+#  Jalankan di terminal yang SAMA sebelum go mod tidy
+# ════════════════════════════════════════════════════════════
+
+$env:CGO_ENABLED="1"
+
+
+# ════════════════════════════════════════════════════════════
+#  STEP 5: Download semua dependencies
+# ════════════════════════════════════════════════════════════
+
+go mod tidy
+
+
+# ════════════════════════════════════════════════════════════
+#  STEP 6: Jalankan server
+# ════════════════════════════════════════════════════════════
+
+$env:CGO_ENABLED="1"; go run main.go
+
+
+# ════════════════════════════════════════════════════════════
+#  STEP 7: Buka di browser
+# ════════════════════════════════════════════════════════════
+
+#  http://localhost:8080
+
+
+# ════════════════════════════════════════════════════════════
+#  BUILD binary (opsional, untuk distribusi)
+# ════════════════════════════════════════════════════════════
+
+$env:CGO_ENABLED="1"; go build -o goshock.exe .
+.\goshock.exe
+
+
+# ════════════════════════════════════════════════════════════
+#  TROUBLESHOOTING
+# ════════════════════════════════════════════════════════════
+
+# ❌ Error: "gcc: exec: gcc: executable file not found"
+#    → GCC belum terinstall atau belum masuk PATH
+#    → Install TDM-GCC lalu restart VS Code
+#    → Cek dengan: gcc --version
+
+# ❌ Error: "cgo: C compiler not found"
+#    → Jalankan: $env:CGO_ENABLED="1" dulu sebelum go run
+
+# ❌ Error: "port already in use"
+#    → Ganti port di main.go baris terakhir: r.Run(":8081")
+
+# ❌ Error: "module not found" atau import error
+#    → Pastikan kamu ada di dalam folder goshock/
+#    → Jalankan ulang: go mod tidy
+
+# ❌ QR Code tidak muncul
+#    → Pastikan server masih berjalan
+#    → Cek console browser (F12) untuk error
