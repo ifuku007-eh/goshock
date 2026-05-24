@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
   BarChart3,
@@ -163,7 +162,8 @@ export default function Dashboard() {
       setUrl("");
       setAlias("");
       setExpiryDays("");
-      await loadLinks(token, true);
+      await loadLinks(token, false);
+      setTab("history");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Gagal membuat short link");
     } finally {

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import QRCode from "qrcode";
 import { getBearerToken, verifyToken } from "@/lib/server/auth";
 import { getSiteUrl, supabase } from "@/lib/server/db";
 import {
@@ -10,10 +11,7 @@ import {
 export async function POST(req: Request) {
   try {
     const token = getBearerToken(req);
-
-    if (!token) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const user = verifyToken(token);
     const formData = await req.formData();
@@ -22,12 +20,9 @@ export async function POST(req: Request) {
     const alias = String(formData.get("alias") || "").trim();
     const expiryDays = String(formData.get("expiry_days") || "");
 
-    if (!longUrl) {
-      return NextResponse.json({ error: "URL tidak boleh kosong" }, { status: 400 });
-    }
+    if (!longUrl) return NextResponse.json({ error: "URL tidak boleh kosong" }, { status: 400 });
 
     let parsed: URL;
-
     try {
       parsed = new URL(longUrl);
     } catch {
@@ -45,7 +40,6 @@ export async function POST(req: Request) {
     }
 
     let expiresAt: string | null = null;
-
     if (expiryDays === "1" || expiryDays === "7" || expiryDays === "30") {
       const date = new Date();
       date.setDate(date.getDate() + Number(expiryDays));
@@ -57,19 +51,13 @@ export async function POST(req: Request) {
     if (alias) {
       if (!isValidAlias(alias)) {
         return NextResponse.json(
-          {
-            error:
-              "Alias hanya boleh huruf, angka, tanda hubung. Min 3, maks 30 karakter.",
-          },
+          { error: "Alias hanya boleh huruf, angka, tanda hubung. Min 3, maks 30 karakter." },
           { status: 400 }
         );
       }
 
       if (reservedWords.has(alias.toLowerCase())) {
-        return NextResponse.json(
-          { error: `Alias '${alias}' tidak bisa digunakan.` },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: `Alias '${alias}' tidak bisa digunakan.` }, { status: 400 });
       }
 
       const { data: existing } = await supabase
@@ -79,10 +67,7 @@ export async function POST(req: Request) {
         .maybeSingle();
 
       if (existing) {
-        return NextResponse.json(
-          { error: `Alias '${alias}' sudah digunakan.` },
-          { status: 409 }
-        );
+        return NextResponse.json({ error: `Alias '${alias}' sudah digunakan.` }, { status: 409 });
       }
 
       shortCode = alias;
@@ -124,11 +109,16 @@ export async function POST(req: Request) {
 
     const siteUrl = getSiteUrl();
 
+    const qrDataUrl = await QRCode.toDataURL(longUrl, {
+      width: 300,
+      margin: 2,
+    });
+
     return NextResponse.json({
       short_url: `${siteUrl}/${data.short_code}`,
       short_code: data.short_code,
       long_url: data.long_url,
-      qr_url: `${siteUrl}/api/qr/${data.short_code}`,
+      qr_url: qrDataUrl,
       clicks: data.clicks,
       expires_at: data.expires_at,
     });

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import QRCode from "qrcode";
 import { getBearerToken, verifyToken } from "@/lib/server/auth";
 import { getSiteUrl, supabase } from "@/lib/server/db";
 
@@ -8,10 +9,7 @@ export async function GET(
 ) {
   try {
     const token = getBearerToken(req);
-
-    if (!token) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const user = verifyToken(token);
 
@@ -63,11 +61,16 @@ export async function GET(
 
     const siteUrl = getSiteUrl();
 
+    const qrDataUrl = await QRCode.toDataURL(urlRecord.long_url, {
+      width: 300,
+      margin: 2,
+    });
+
     return NextResponse.json({
       short_code: urlRecord.short_code,
       short_url: `${siteUrl}/${urlRecord.short_code}`,
       long_url: urlRecord.long_url,
-      qr_url: `${siteUrl}/api/qr/${urlRecord.short_code}`,
+      qr_url: qrDataUrl,
       clicks: urlRecord.clicks,
       created_at: urlRecord.created_at,
       expires_at: urlRecord.expires_at,
