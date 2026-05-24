@@ -141,11 +141,18 @@ export async function shortenURL(
 
 export async function getLinks(token: string): Promise<LinkItem[]> {
   const res = await fetch(`${API_BASE}/links`, {
-    headers: authHeaders(token),
-    credentials: "include",
+    method: "GET",
+    headers: {
+      ...authHeaders(token),
+      "Cache-Control": "no-cache",
+    },
+    cache: "no-store",
   });
 
-  return parseResponse<LinkItem[]>(res);
+  const data = await parseResponse<LinkItem[]>(res);
+  console.log("GET LINKS RESULT:", data);
+
+  return data;
 }
 
 export async function getChart(

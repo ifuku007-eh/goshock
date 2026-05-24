@@ -9,6 +9,7 @@ export async function GET(req: Request) {
     if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const user = verifyToken(token);
+    console.log("GET LINKS USER:", user);
 
     const { data, error } = await supabase
       .from("urls")
