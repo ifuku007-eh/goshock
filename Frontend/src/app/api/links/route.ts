@@ -3,22 +3,31 @@ import QRCode from "qrcode";
 import { getBearerToken, verifyToken } from "@/lib/server/auth";
 import { getSiteUrl, supabase } from "@/lib/server/db";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET(req: Request) {
   try {
     const token = getBearerToken(req);
-    if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    if (!token) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     const user = verifyToken(token);
-    console.log("GET LINKS USER:", user);
+    const userId = Number(user.user_id);
 
     const { data, error } = await supabase
       .from("urls")
-      .select("id, short_code, long_url, clicks, created_at, expires_at")
-      .eq("user_id", user.user_id)
+      .select("id, user_id, short_code, long_url, clicks, created_at, expires_at")
+      .eq("user_id", userId)
       .order("created_at", { ascending: false });
 
     if (error) {
-      return NextResponse.json({ error: "Gagal mengambil data" }, { status: 500 });
+      return NextResponse.json(
+        { error: error.message || "Gagal mengambil data" },
+        { status: 500 }
+      );
     }
 
     const siteUrl = getSiteUrl();
@@ -47,7 +56,11 @@ export async function GET(req: Request) {
       })
     );
 
-    return NextResponse.json(result);
+    return NextResponse.json(result, {
+      headers: {
+        "Cache-Control": "no-store, no-cache, must-revalidate",
+      },
+    });
   } catch {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

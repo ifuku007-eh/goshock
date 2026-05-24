@@ -8,6 +8,9 @@ import {
   reservedWords,
 } from "@/lib/server/shortcode";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function POST(req: Request) {
   try {
     const token = getBearerToken(req);
