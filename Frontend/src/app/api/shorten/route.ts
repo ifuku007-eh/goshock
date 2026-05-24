@@ -11,7 +11,8 @@ import {
 export async function POST(req: Request) {
   try {
     const token = getBearerToken(req);
-    if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!token)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const user = verifyToken(token);
     const formData = await req.formData();
@@ -20,7 +21,11 @@ export async function POST(req: Request) {
     const alias = String(formData.get("alias") || "").trim();
     const expiryDays = String(formData.get("expiry_days") || "");
 
-    if (!longUrl) return NextResponse.json({ error: "URL tidak boleh kosong" }, { status: 400 });
+    if (!longUrl)
+      return NextResponse.json(
+        { error: "URL tidak boleh kosong" },
+        { status: 400 },
+      );
 
     let parsed: URL;
     try {
@@ -28,14 +33,14 @@ export async function POST(req: Request) {
     } catch {
       return NextResponse.json(
         { error: "URL tidak valid. Harus diawali http:// atau https://" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
       return NextResponse.json(
         { error: "URL tidak valid. Harus diawali http:// atau https://" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -51,13 +56,19 @@ export async function POST(req: Request) {
     if (alias) {
       if (!isValidAlias(alias)) {
         return NextResponse.json(
-          { error: "Alias hanya boleh huruf, angka, tanda hubung. Min 3, maks 30 karakter." },
-          { status: 400 }
+          {
+            error:
+              "Alias hanya boleh huruf, angka, tanda hubung. Min 3, maks 30 karakter.",
+          },
+          { status: 400 },
         );
       }
 
       if (reservedWords.has(alias.toLowerCase())) {
-        return NextResponse.json({ error: `Alias '${alias}' tidak bisa digunakan.` }, { status: 400 });
+        return NextResponse.json(
+          { error: `Alias '${alias}' tidak bisa digunakan.` },
+          { status: 400 },
+        );
       }
 
       const { data: existing } = await supabase
@@ -67,7 +78,10 @@ export async function POST(req: Request) {
         .maybeSingle();
 
       if (existing) {
-        return NextResponse.json({ error: `Alias '${alias}' sudah digunakan.` }, { status: 409 });
+        return NextResponse.json(
+          { error: `Alias '${alias}' sudah digunakan.` },
+          { status: 409 },
+        );
       }
 
       shortCode = alias;
@@ -89,22 +103,46 @@ export async function POST(req: Request) {
     }
 
     if (!shortCode) {
-      return NextResponse.json({ error: "Gagal membuat short code" }, { status: 500 });
+      return NextResponse.json(
+        { error: "Gagal membuat short code" },
+        { status: 500 },
+      );
     }
 
     const { data, error } = await supabase
       .from("urls")
       .insert({
-        user_id: user.user_id,
+        user_id: Number(user.user_id),
         short_code: shortCode,
         long_url: longUrl,
+        clicks: 0,
         expires_at: expiresAt,
       })
-      .select("short_code, long_url, clicks, expires_at")
+      .select(
+        "id, user_id, short_code, long_url, clicks, created_at, expires_at",
+      )
       .single();
 
     if (error) {
-      return NextResponse.json({ error: "Gagal menyimpan URL" }, { status: 500 });
+      console.error("SUPABASE INSERT ERROR:", error);
+      return NextResponse.json(
+        { error: error.message || "Gagal menyimpan URL" },
+        { status: 500 },
+      );
+    }
+
+    if (!data) {
+      return NextResponse.json(
+        { error: "Data tidak tersimpan ke database" },
+        { status: 500 },
+      );
+    }
+
+    if (error) {
+      return NextResponse.json(
+        { error: "Gagal menyimpan URL" },
+        { status: 500 },
+      );
     }
 
     const siteUrl = getSiteUrl();
@@ -123,6 +161,9 @@ export async function POST(req: Request) {
       expires_at: data.expires_at,
     });
   } catch {
-    return NextResponse.json({ error: "Gagal membuat short link" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Gagal membuat short link" },
+      { status: 500 },
+    );
   }
 }
