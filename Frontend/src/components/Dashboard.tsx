@@ -194,29 +194,22 @@ export default function Dashboard() {
   }
 
   async function handleDelete(code: string) {
-  setError("");
+    setError("");
 
-  const confirmed = window.confirm(
-    "Apakah Anda yakin ingin menghapus link ini?"
-  );
-
-  if (!confirmed) return;
-
-  try {
-    await deleteLink(code, token);
-
-    setLinks((prev) =>
-      prev.filter((l) => l.short_code !== code)
+    const confirmed = window.confirm(
+      "Apakah Anda yakin ingin menghapus link ini?",
     );
 
-  } catch (err) {
-    setError(
-      err instanceof Error
-        ? err.message
-        : "Gagal menghapus link"
-    );
+    if (!confirmed) return;
+
+    try {
+      await deleteLink(code, token);
+
+      setLinks((prev) => prev.filter((l) => l.short_code !== code));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Gagal menghapus link");
+    }
   }
-}
 
   function handleDownloadQR(qrUrl: string) {
     window.open(qrUrl, "_blank");
@@ -626,13 +619,10 @@ function ResultModal({
 
         <div className="flex gap-4">
           <div className="rounded-lg bg-white p-2 shrink-0">
-            <Image
+            <img
               src={item.qr_url}
-              alt="QR"
-              width={110}
-              height={110}
-              className="rounded"
-              unoptimized
+              alt="QR Code"
+              className="h-[110px] w-[110px] rounded"
             />
           </div>
           <div className="flex-1 min-w-0 space-y-3">
@@ -742,13 +732,10 @@ function ChartModal({
             {/* Info link */}
             <div className="flex gap-4 items-start">
               <div className="rounded-lg bg-white p-2 shrink-0">
-                <Image
+                <img
                   src={data.qr_url}
-                  alt="QR"
-                  width={80}
-                  height={80}
-                  className="rounded"
-                  unoptimized
+                  alt="QR Code"
+                  className="h-[80px] w-[80px] rounded"
                 />
               </div>
               <div className="flex-1 min-w-0 space-y-2">
@@ -895,13 +882,10 @@ function HistoryDetailModal({
         {/* QR */}
         <div className="mb-5 flex justify-center">
           <div className="rounded-xl bg-white p-3">
-            <Image
+            <img
               src={item.qr_url}
               alt="QR Code"
-              width={180}
-              height={180}
-              className="rounded-lg"
-              unoptimized
+              className="h-[180px] w-[180px] rounded-lg"
             />
           </div>
         </div>

@@ -7,27 +7,26 @@ export async function GET(
   { params }: { params: { code: string } }
 ) {
   try {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("urls")
       .select("long_url")
       .eq("short_code", params.code)
       .single();
 
-    if (!data) {
+    if (error || !data) {
       return NextResponse.json({ error: "Tidak ditemukan" }, { status: 404 });
     }
 
-    const buffer = await QRCode.toBuffer(data.long_url, {
+    const svg = await QRCode.toString(data.long_url, {
+      type: "svg",
       width: 300,
       margin: 2,
     });
 
-    const body = new Uint8Array(buffer);
-
-    return new Response(body, {
+    return new Response(svg, {
       status: 200,
       headers: {
-        "Content-Type": "image/png",
+        "Content-Type": "image/svg+xml",
         "Cache-Control": "public, max-age=86400",
       },
     });
